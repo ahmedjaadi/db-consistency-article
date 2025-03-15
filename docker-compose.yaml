@@ -27,17 +27,13 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
       KAFKA_COMPRESSION_TYPE: snappy
-      KAFKA_SCHEMA_REGISTRY_URL: http://schema-registry:8081
 
-  schema-registry:
-    image: confluentinc/cp-schema-registry:latest
-    ports:
-      - "8081:8081"
-    environment:
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:9092
-      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
 
   java-app:
     image: openjdk:21-jdk
@@ -47,6 +43,5 @@ services:
       APP_ENV: production
     depends_on:
       - kafka
-      - schema-registry
       - postgres
       - zookeeper
