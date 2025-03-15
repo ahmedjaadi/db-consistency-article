@@ -4,8 +4,9 @@ import com.consistency.example.consistencydb.domain.Sale;
 import com.consistency.example.consistencydb.domain.SaleStatus;
 import com.consistency.example.consistencydb.repeatableread.RepeatableReadProducer;
 import com.consistency.example.consistencydb.repository.SaleRepository;
-import org.apache.kafka.clients.producer.KafkaProducer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,11 +28,7 @@ public class ExperimentController {
     }
 
     @GetMapping("/sale")
-    public String sale() {
-        Sale sale = new Sale(SaleStatus.NOT_INITIALIZED, BigDecimal.ONE);
-        sale = saleRepository.save(sale);
-        Optional<Sale> result = saleRepository.findById(sale.getId());
-        System.out.println(result.get().getStatus());
-        return "Message sent!";
+    public Page<Sale> getAllSales(Pageable pageable) {
+        return saleRepository.findAll(pageable);
     }
 }

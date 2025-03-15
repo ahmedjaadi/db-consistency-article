@@ -8,10 +8,13 @@ import java.math.BigDecimal;
 @Table(name = "sale")
 public class Sale {
 
+    public Sale(){}
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private SaleStatus status;
 
