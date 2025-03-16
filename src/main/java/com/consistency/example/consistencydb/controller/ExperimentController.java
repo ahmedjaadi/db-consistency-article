@@ -1,34 +1,44 @@
 package com.consistency.example.consistencydb.controller;
 
 import com.consistency.example.consistencydb.domain.Sale;
-import com.consistency.example.consistencydb.domain.SaleStatus;
-import com.consistency.example.consistencydb.repeatableread.RepeatableReadProducer;
-import com.consistency.example.consistencydb.repository.SaleRepository;
+import com.consistency.example.consistencydb.domain.dto.SaleStatusCount;
+import com.consistency.example.consistencydb.repeatableread.RepeatableReadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigDecimal;
-import java.util.Optional;
+import java.util.List;
 
 @RestController
 public class ExperimentController {
     @Autowired
-    private SaleRepository saleRepository;
+    RepeatableReadService repeatableReadService;
 
-    @Autowired
-    private RepeatableReadProducer repeatableReadProducer;
-
-    @GetMapping("/send")
-    public String sendMessage() {
-        repeatableReadProducer.sendMessage("my-topic", "key", "test");
-        return "Message sent!";
+    @PostMapping("/repeatable-read")
+    public ResponseEntity<Void> sendMessage() {
+        Thread.ofVirtual().start(() -> repeatableReadService.process());
+        return ResponseEntity.accepted().build();
     }
 
-    @GetMapping("/sale")
-    public Page<Sale> getAllSales(Pageable pageable) {
-        return saleRepository.findAll(pageable);
+    @GetMapping("/repeatable-read/status-count")
+    public ResponseEntity<List<SaleStatusCount>> statusCount() {
+        var response = repeatableReadService.getSalesStatusCount();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/repeatable-read")
+    public ResponseEntity<Page<Sale>> getAllSales(Pageable pageable) {
+        var response = repeatableReadService.getAllSales(pageable);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/elapsed")
+    public ResponseEntity<String> elapsed() {
+        var response = repeatableReadService.getElapsedTime();
+        return ResponseEntity.ok("Elapsed time: " + response + " seconds");
     }
 }
