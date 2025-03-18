@@ -1,8 +1,10 @@
 package com.consistency.example.consistencydb.controller;
 
-import com.consistency.example.consistencydb.domain.Sale;
+import com.consistency.example.consistencydb.domain.entity.Sale;
 import com.consistency.example.consistencydb.domain.dto.SaleStatusCount;
-import com.consistency.example.consistencydb.repeatableread.RepeatableReadService;
+import com.consistency.example.consistencydb.domain.service.SaleService;
+import com.consistency.example.consistencydb.domain.service.paginationzero.PaginationZeroService;
+import com.consistency.example.consistencydb.domain.service.repeatableread.RepeatableReadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,27 +20,45 @@ public class ExperimentController {
     @Autowired
     RepeatableReadService repeatableReadService;
 
+    @Autowired
+    PaginationZeroService paginationZeroService;
+
+    @Autowired
+    SaleService saleService;
+
     @PostMapping("/repeatable-read")
-    public ResponseEntity<Void> sendMessage() {
+    public ResponseEntity<Void> repeatable() {
         Thread.ofVirtual().start(() -> repeatableReadService.process());
         return ResponseEntity.accepted().build();
     }
 
-    @GetMapping("/repeatable-read/status-count")
+    @PostMapping("/pagination-zero")
+    public ResponseEntity<Void> pagination() {
+        Thread.ofVirtual().start(() -> paginationZeroService.process());
+        return ResponseEntity.accepted().build();
+    }
+
+    @GetMapping("/status-count")
     public ResponseEntity<List<SaleStatusCount>> statusCount() {
-        var response = repeatableReadService.getSalesStatusCount();
+        var response = saleService.getSalesStatusCount();
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/repeatable-read")
+    @GetMapping("/elapsed-time")
+    public ResponseEntity<String> elapsedTime() {
+        var response = saleService.getTotalTimeElapsed();
+        return ResponseEntity.ok("Total time elapsed in seconds: " + response);
+    }
+
+    @GetMapping("/sales")
     public ResponseEntity<Page<Sale>> getAllSales(Pageable pageable) {
-        var response = repeatableReadService.getAllSales(pageable);
+        var response = saleService.getAllSales(pageable);
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/elapsed")
-    public ResponseEntity<String> elapsed() {
-        var response = repeatableReadService.getElapsedTime();
-        return ResponseEntity.ok("Elapsed time: " + response + " seconds");
+    @PostMapping("/reset")
+    public ResponseEntity<Void> reset() {
+        saleService.updateAllToNotInitialize();
+        return ResponseEntity.ok().build();
     }
 }

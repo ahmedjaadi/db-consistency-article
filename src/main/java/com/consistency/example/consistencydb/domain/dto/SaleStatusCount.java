@@ -1,6 +1,6 @@
 package com.consistency.example.consistencydb.domain.dto;
 
-import com.consistency.example.consistencydb.domain.SaleStatus;
+import com.consistency.example.consistencydb.domain.entity.SaleStatus;
 
 public class SaleStatusCount {
     private SaleStatus status;

@@ -1,14 +1,18 @@
-package com.consistency.example.consistencydb.domain;
+package com.consistency.example.consistencydb.domain.entity;
 
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 
 @Entity
 @Table(name = "sale")
 public class Sale {
 
-    public Sale(){}
+    public Sale(){
+        this.setCreatedAt(Instant.now());
+        this.setUpdatedAt(Instant.now());
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +25,14 @@ public class Sale {
     @Column(name = "sold")
     private BigDecimal sold;
 
+    @Column(name = "created_at")
+    private Instant createdAt;
+
+    @Column(name = "updated_at")
+    private Instant updatedAt;
+
     public Sale(SaleStatus status, BigDecimal sold) {
+        this();
         this.status = status;
         this.sold = sold;
     }
@@ -45,5 +56,13 @@ public class Sale {
     public void setSold(BigDecimal sold) {
         this.sold = sold;
     }
+
+    public Instant getCreatedAt() { return createdAt; }
+
+    public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
+
+    public Instant getUpdatedAt() { return updatedAt; }
+
+    public void setUpdatedAt(Instant updatedAt) { this.updatedAt = updatedAt; }
 }
 

@@ -1,11 +1,11 @@
-package com.consistency.example.consistencydb.repeatableread;
+package com.consistency.example.consistencydb.messaging;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
-public class RepeatableReadProducer {
+public class SaleEventProducer {
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
 
