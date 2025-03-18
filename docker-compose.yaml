@@ -28,19 +28,38 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_COMPRESSION_TYPE: snappy
+      KAFKA_LOG_RETENTION_MS: 20000
+      KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 5000
 
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
 
-  java-app:
+  java-app-1:
     image: openjdk:21-jdk
     deploy:
-      replicas: 2
-    environment:
-      APP_ENV: production
+      replicas: 1
+    volumes:
+      - ./build/libs/consistencydb-0.0.1-SNAPSHOT.jar:/app.jar
+    command: [ "java", "-jar", "/app.jar" ]
+    ports:
+      - "8080:8080"
+    depends_on:
+      - kafka
+      - postgres
+      - zookeeper
+
+  java-app-2:
+    image: openjdk:21-jdk
+    deploy:
+      replicas: 1
+    volumes:
+      - ./build/libs/consistencydb-0.0.1-SNAPSHOT.jar:/app.jar
+    command: [ "java", "-jar", "/app.jar" ]
+    ports:
+      - "8081:8080"
     depends_on:
       - kafka
       - postgres

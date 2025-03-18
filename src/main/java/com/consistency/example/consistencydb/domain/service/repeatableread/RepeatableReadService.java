@@ -32,24 +32,23 @@ public class RepeatableReadService {
 
         saleService.updateAllCreatedAt();
 
-        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
-            do {
-                pageSale = saleService.findAllByStatus(SaleStatus.NOT_INITIALIZED, pagination);
+        do {
+            pageSale = saleService.findAllByStatus(SaleStatus.NOT_INITIALIZED, pagination);
 
-                var futures = pageSale.stream().map(sale ->
-                        CompletableFuture.runAsync(
-                                () -> {
-                                    var event = new SaleEvent(sale.getId(), EventType.REPEATABLE_READ);
-                                    saleEventProducer.sendMessage("my-topic", "key", event.toString());
-                                },
-                                executor
-                        )
-                ).toArray(CompletableFuture[]::new);
+            pageSale.forEach(
+                    sale -> {
+                        var event = new SaleEvent(sale.getId(), EventType.PAGINATION_ZERO);
+                        saleEventProducer.sendMessage("my-topic", "key", event.toString());
+                    }
+            );
 
-                CompletableFuture.allOf(futures).join();
+            try {
+                Thread.sleep(40);
+            } catch (InterruptedException ex) {
+                System.out.println("Erro no thread sleep");
+            }
 
-                pagination = pageSale.getPageable().next();
-            } while (pageSale.hasNext());
-        }
+            pagination = pageSale.getPageable().next();
+        } while (pageSale.hasNext());
     }
 }
