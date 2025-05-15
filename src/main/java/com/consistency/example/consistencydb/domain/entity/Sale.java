@@ -14,6 +14,9 @@ public class Sale {
         this.setUpdatedAt(Instant.now());
     }
 
+    @Version
+    private Long version;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -64,5 +67,13 @@ public class Sale {
     public Instant getUpdatedAt() { return updatedAt; }
 
     public void setUpdatedAt(Instant updatedAt) { this.updatedAt = updatedAt; }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
 }
 

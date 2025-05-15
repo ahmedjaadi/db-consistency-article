@@ -20,8 +20,15 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
 
     @Modifying
     @Transactional
-    @Query("UPDATE Sale s SET s.status = :status, s.updatedAt = CURRENT_TIMESTAMP WHERE s.id = :id")
-    void updateStatusById(@Param("id") Long id, @Param("status") SaleStatus status);
+    @Query("""
+    UPDATE Sale s
+       SET s.status    = :status,
+           s.updatedAt = CURRENT_TIMESTAMP,
+           s.version   = s.version + 1
+     WHERE s.id       = :id
+       AND s.version  = :expectedVersion
+    """)
+    int updateStatusById(@Param("id") Long id, @Param("status") SaleStatus status, Long expectedVersion);
 
     @Query("SELECT new com.consistency.example.consistencydb.domain.dto.SaleStatusCount(s.status, COUNT(s)) FROM Sale s GROUP BY s.status")
     List<SaleStatusCount> countByEachStatus();

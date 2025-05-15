@@ -21,13 +21,9 @@ public class SaleEventConsumer {
         var saleEvent = SaleEvent.toSaleEvent(record.value());
 
         assert saleEvent != null;
-        //Verifying idempotency
-        if(saleEvent.type().equals(EventType.PAGINATION_ZERO)) {
-            var sale = saleService.findById(saleEvent.id());
-            if (sale.get().getStatus().equals(SaleStatus.PROCESSING))
-                return;
-        }
 
-        saleService.updateSaleStatus(saleEvent.id(), SaleStatus.PROCESSING);
+        Boolean idempotency = saleEvent.type().equals(EventType.PAGINATION_ZERO);
+
+        saleService.processSaleEvent(saleEvent.id(), idempotency);
     }
 }
