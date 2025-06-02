@@ -24,18 +24,6 @@ public class SaleService {
     @Autowired
     private SaleAuditRepository saleAuditRepository;
 
-    @Transactional
-    public void updateSaleStatus(Long id, SaleStatus status) {
-        Sale sale = saleRepository.findById(id).orElseThrow();
-        var rows = saleRepository.updateStatusById(id, status, sale.getVersion());
-
-        if (rows == 0) return;
-
-        var salePersisted = saleRepository.findById(id);
-        var saleAudit = SaleAudit.fromSale(salePersisted.get());
-        saleAuditRepository.save(saleAudit);
-    }
-
     public List<SaleStatusCount> getSalesStatusCount(){
         return saleRepository.countByEachStatus();
     }
@@ -55,7 +43,14 @@ public class SaleService {
                 return;
         }
 
-        this.updateSaleStatus(id, SaleStatus.PROCESSING);
+        Sale sale = saleRepository.findById(id).orElseThrow();
+        var rows = saleRepository.updateStatusById(id, SaleStatus.PROCESSING, sale.getVersion());
+
+        if (rows == 0) return;
+
+        var salePersisted = saleRepository.findById(id);
+        var saleAudit = SaleAudit.fromSale(salePersisted.get());
+        saleAuditRepository.save(saleAudit);
     }
 
     public Optional<Sale> findById(Long id) {

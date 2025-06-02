@@ -21,6 +21,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @SpringBootTest
 @ActiveProfiles("test")
 class IdempotencyTest {
@@ -52,27 +54,19 @@ class IdempotencyTest {
 
         ExecutorService executor = Executors.newFixedThreadPool(2);
 
-        Future<String> job1 = executor.submit(() -> {
+        executor.submit(() -> {
             saleService.processSaleEvent(saleId, true);
             return "Job1 succeeded";
         });
 
-        Future<String> job2 = executor.submit(() -> {
+         executor.submit(() -> {
             Thread.sleep(10);
             saleService.processSaleEvent(saleId, true);
             return "Job2 succeeded";
         });
 
-        String result1 = job1.get();
-        String result2 = job2.get();
-
         executor.shutdown();
 
-        System.out.println("Result1: " + result1);
-        System.out.println("Result2: " + result2);
-
-        var versions = saleAuditService.findAll();
-
-        System.out.println("Versions: " + versions.size());
+        assertThat(saleAuditService.findAll()).hasSize(1);
     }
 }

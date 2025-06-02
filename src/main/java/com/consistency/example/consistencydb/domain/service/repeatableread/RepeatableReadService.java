@@ -36,17 +36,11 @@ public class RepeatableReadService {
             pageSale = saleService.findAllByStatus(SaleStatus.NOT_INITIALIZED, pagination);
 
             pageSale.forEach(
-                    sale -> {
-                        var event = new SaleEvent(sale.getId(), EventType.PAGINATION_ZERO);
-                        saleEventProducer.sendMessage("my-topic", "key", event.toString());
-                    }
+                sale -> {
+                    var event = new SaleEvent(sale.getId(), EventType.REPEATABLE_READ);
+                    saleEventProducer.sendMessage("my-topic", "key", event.toString());
+                }
             );
-
-            try {
-                Thread.sleep(40);
-            } catch (InterruptedException ex) {
-                System.out.println("Erro no thread sleep");
-            }
 
             pagination = pageSale.getPageable().next();
         } while (pageSale.hasNext());

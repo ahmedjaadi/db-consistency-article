@@ -34,7 +34,13 @@ public class ExperimentController {
 
     @PostMapping("/pagination-zero")
     public ResponseEntity<Void> pagination() {
-        Thread.ofVirtual().start(() -> paginationZeroService.process());
+        Thread.ofVirtual().start(() -> paginationZeroService.process(false));
+        return ResponseEntity.accepted().build();
+    }
+
+    @PostMapping("/pagination-zero-fixed")
+    public ResponseEntity<Void> paginationFixed() {
+        Thread.ofVirtual().start(() -> paginationZeroService.process(true));
         return ResponseEntity.accepted().build();
     }
 

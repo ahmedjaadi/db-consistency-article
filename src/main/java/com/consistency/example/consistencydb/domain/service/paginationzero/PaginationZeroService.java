@@ -23,7 +23,7 @@ public class PaginationZeroService {
     @Autowired
     private SaleEventProducer saleEventProducer;
 
-    public void process() {
+    public void process(Boolean fixed) {
         Pageable pagination = PageRequest.of(0, 100);
         Page<Sale> pageSale;
 
@@ -39,12 +39,15 @@ public class PaginationZeroService {
                 }
             );
 
-            try {
-                Thread.sleep(40);
-            } catch (InterruptedException ex) {
-                System.out.println("Erro no thread sleep");
+            if (!fixed) {
+                pagination = pageSale.getPageable().next();
+            } else {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ex) {
+                    System.out.println("Erro no thread sleep");
+                }
             }
-
         } while (pageSale.hasNext());
     }
 }
