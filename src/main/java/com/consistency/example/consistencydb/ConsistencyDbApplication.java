@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ConsistencydbApplication {
+public class ConsistencyDbApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ConsistencydbApplication.class, args);
+		SpringApplication.run(ConsistencyDbApplication.class, args);
 	}
 
 }
