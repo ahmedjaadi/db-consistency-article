@@ -161,20 +161,53 @@ curl -X POST http://localhost:8080/pagination-zero-fixed
 curl http://localhost:8080/elapsed-time
 ----
 
+== IntelliJ Kafka Integration
+
+=== Setting Up IntelliJ Big Data Tools Plugin
+
+To connect to the Kafka instance from IntelliJ IDEA Ultimate edition:
+
+1. Ensure the "Big Data Tools" plugin is enabled (it comes pre-installed with IntelliJ IDEA Ultimate):
+   a. Go to `File > Settings > Plugins` (or `IntelliJ IDEA > Preferences > Plugins` on macOS)
+   b. Search for "Big Data Tools" in the Installed tab
+   c. Make sure it's enabled (if not, click "Enable")
+
+2. Configure the Kafka connection:
+   a. Open the Big Data Tools window by clicking on `View > Tool Windows > Big Data Tools` or the Big Data Tools icon in the right sidebar
+   b. Click on the "+" button in the Big Data Tools window
+   c. Select "Apache Kafka" from the dropdown menu
+   d. In the "New Kafka Connection" dialog:
+      - Enter a name for the connection (e.g., "Local Docker Kafka")
+      - Set the Bootstrap Servers to `localhost:29092`
+      - Leave other settings at their default values
+   e. Click "Test Connection" to verify the connection works
+   f. Click "OK" to save the configuration
+
+3. Using the Big Data Tools for Kafka:
+   a. In the Big Data Tools window, expand your Kafka connection
+   b. Click on "Topics" to see the list of available topics
+   c. Right-click on a topic (e.g., `sales-data-topic`) to:
+      - View messages in the topic
+      - Produce new messages to the topic
+      - View topic details and configuration
+   d. Double-click on a topic to open the message browser
+
+NOTE: The Kafka instance is configured with an external listener on port 29092, which allows tools running on your host machine (like IntelliJ) to connect to it.
+
 == Stopping the Application
 
 To stop all services:
 
 [source,bash]
 ----
-docker-compose down
+docker compose down
 ----
 
 To stop and remove all data (volumes):
 
 [source,bash]
 ----
-docker-compose down -v
+docker compose down -v
 ----
 
 == Project Structure
